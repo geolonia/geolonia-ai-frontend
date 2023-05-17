@@ -1,24 +1,19 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import Map from './Map'
+import './App.scss';
 
 function App() {
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <div className="map-contaienr"><Map className='map'></Map></div>
+      <div className="chat-container">
+        <div className="chat-inner-container">
+          <div className="messages">
+            <div className="message request">香川県高松市を表示してください。</div>
+            <div className="message response">かしこまりました。高松市を表示します。</div>
+          </div>
+          <div className="form"><input type="text" placeholder="何でも聞いてください..." /></div>
+        </div>
+      </div>
     </div>
   );
 }
