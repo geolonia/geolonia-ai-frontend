@@ -29,8 +29,28 @@ const ChatInputForm: React.FC<{ onSubmit: (text: string) => void }> = ({ onSubmi
 const App: React.FC = () => {
   const [ messages, setMessages ] = useState<Message[]>([]);
 
-  const onSubmit = useCallback((text: string) => {
+  const onSubmit = useCallback(async (text: string) => {
     setMessages((prev) => [...prev, { type: 'request', text }]);
+    const resp = await fetch('https://slcfryujr2yuyl56jbzwqkqjt40ttaxz.lambda-url.ap-northeast-1.on.aws/', {
+      method: 'POST',
+      body: JSON.stringify({ text }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      mode: 'no-cors',
+    });
+    const reader = resp.body?.getReader();
+    if (!reader) return;
+    const decoder = new TextDecoder('utf-8');
+    const chunks: string[] = [];
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      if (!value) continue;
+
+      chunks.push(decoder.decode(value));
+    }
+    console.log(chunks);
   }, []);
 
   return (
