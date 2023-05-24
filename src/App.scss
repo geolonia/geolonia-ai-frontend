@@ -42,7 +42,7 @@ html, body, #root, .App
 
     .message
     {
-      width: calc(90% - 10px);
+      // width: calc(90% - 10px);
       background-color: #FFF;
       margin-bottom: 16px;
       padding: 16px;
@@ -77,7 +77,8 @@ html, body, #root, .App
       {
         color: #000000;
         margin-left: 10px;
-        height: 120px;
+        // height: 120px;
+        float: left;
 
         &:after {
           display: block;
