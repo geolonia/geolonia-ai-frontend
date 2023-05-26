@@ -80,6 +80,20 @@ html, body, #root, .App
         // height: 120px;
         float: left;
 
+        margin-left: 48px;
+        &:before {
+          content: "";
+          width: 32px;
+          height: 32px;
+          background: url(../public/geolonia-symbol_2.jpg) no-repeat center center;
+          background-size: cover;
+          border-radius: 100px;
+          overflow: hidden;
+          display: block;
+          position: absolute;
+          top: 0px;
+          left: -48px;
+        }
         &:after {
           display: block;
           position: absolute;
