@@ -122,12 +122,15 @@ html, body, #root, .App
 
     input
     {
-      width: calc(100% - 48px);
+      width: calc(100% - 60px);
       max-width: 100%;
       box-sizing: border-box;
       border: 1px solid #DDDDDD;
-      padding: 8px;
+      padding: 12px;
       font-size: 0.9rem;
+      border-radius: 8px;
+      box-shadow: 0 0px 4px 4px rgba(0, 0, 0, .4);
+      margin-bottom: 10px;
     }
   }
 }
