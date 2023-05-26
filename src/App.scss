@@ -27,7 +27,7 @@ html, body, #root, .App
   width: 100%;
   height: $chat-container-height;
   box-sizing: border-box;
-  padding: 24px 24px 48px 24px;
+  padding: 24px 24px 60px 24px;
   overflow: scroll;
 }
 
@@ -126,13 +126,13 @@ html, body, #root, .App
       width: calc(100% - 60px);
       max-width: 100%;
       box-sizing: border-box;
-      border: 1px solid #DDDDDD;
+      border: 2px solid #1C87EB;
       padding: 12px;
       font-size: 0.9rem;
       border-radius: 8px;
       box-shadow: 0 0px 4px 4px rgba(0, 0, 0, .4);
-      margin-bottom: 10px;
-      background: #fff url(../public/send.svg) no-repeat center right 10px;
+      margin-bottom: 16px;
+      background: #dbedfd url(../public/send.svg) no-repeat center right 10px;
       background-size: 20px auto;
     }
   }
