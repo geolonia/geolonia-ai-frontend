@@ -27,7 +27,7 @@ html, body, #root, .App
   width: 100%;
   height: $chat-container-height;
   box-sizing: border-box;
-  padding: 24px;
+  padding: 24px 24px 48px 24px;
   overflow: scroll;
 }
 
@@ -39,6 +39,7 @@ html, body, #root, .App
   .messages
   {
     width: 100%;
+    overflow: hidden;
 
     .message
     {
@@ -115,8 +116,8 @@ html, body, #root, .App
 
   .form
   {
-    position: absolute;
-    bottom: 24px;
+    position: fixed;
+    bottom: 16px;
     width: 100%;
     z-index: 9999;
 
