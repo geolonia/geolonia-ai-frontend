@@ -1,12 +1,24 @@
 import Map from './Map'
 import './App.scss';
 import { useCallback, useLayoutEffect, useRef, useState } from 'react';
+import classNames from 'classnames';
 import { Message } from './types';
 
 const SingleMessage: React.FC<{ message: Message }> = ({ message }) => {
+  if (message.pending) {
+    return (
+      <div className={`message ${message.type} is-pending`}>
+        …
+      </div>
+    )
+  }
   return (
-    <div className={`message ${message.type}`}>
-      {message.text}
+    <div className={classNames({
+      message: true,
+      [message.type]: true,
+      'is-pending': message.pending,
+    })}>
+      {message.pending ? '...' : message.text}
     </div>
   )
 };
@@ -31,7 +43,11 @@ const App: React.FC = () => {
   const chatContainerRef = useRef<HTMLDivElement>(null);
 
   const onSubmit = useCallback(async (text: string) => {
-    setMessages((prev) => [...prev, { type: 'request', text }]);
+    setMessages((prev) => [
+      ...prev,
+      { type: 'request', text },
+      { type: 'response', text: '', pending: true },
+    ]);
     const resp = await fetch('https://slcfryujr2yuyl56jbzwqkqjt40ttaxz.lambda-url.ap-northeast-1.on.aws/', {
       method: 'POST',
       body: JSON.stringify({ text }),
@@ -42,7 +58,7 @@ const App: React.FC = () => {
 
     const body = await resp.json();
     setMessages((prev) => [
-      ...prev,
+      ...prev.filter((x) => !x.pending),
       ...body.lines.map((x: { content: string }) => ({ type: 'response', text: x.content })),
     ]);
   }, []);
