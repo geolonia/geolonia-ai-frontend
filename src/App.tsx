@@ -1,6 +1,6 @@
 import Map from './Map'
 import './App.scss';
-import { useCallback, useState } from 'react';
+import { useCallback, useLayoutEffect, useRef, useState } from 'react';
 import { Message } from './types';
 
 const SingleMessage: React.FC<{ message: Message }> = ({ message }) => {
@@ -28,6 +28,7 @@ const ChatInputForm: React.FC<{ onSubmit: (text: string) => void }> = ({ onSubmi
 
 const App: React.FC = () => {
   const [ messages, setMessages ] = useState<Message[]>([]);
+  const chatContainerRef = useRef<HTMLDivElement>(null);
 
   const onSubmit = useCallback(async (text: string) => {
     setMessages((prev) => [...prev, { type: 'request', text }]);
@@ -38,26 +39,24 @@ const App: React.FC = () => {
         'Content-Type': 'application/json',
       },
     });
-    // const reader = resp.body?.getReader();
-    // if (!reader) return;
-    // const decoder = new TextDecoder('utf-8');
-    // const chunks: string[] = [];
-    // while (true) {
-    //   const { done, value } = await reader.read();
-    //   if (done) break;
-    //   if (!value) continue;
 
-    //   chunks.push(decoder.decode(value));
-    // }
-    // console.log(chunks);
     const body = await resp.json();
-    setMessages((prev) => [...prev, ...body.lines.map((x: { content: string }) => ({ type: 'response', text: x.content }))]);
+    setMessages((prev) => [
+      ...prev,
+      ...body.lines.map((x: { content: string }) => ({ type: 'response', text: x.content })),
+    ]);
   }, []);
+
+  useLayoutEffect(() => {
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTo(0, chatContainerRef.current.scrollHeight);
+    }
+  }, [messages]);
 
   return (
     <div className="App">
       <div className="map-contaienr"><Map className='map'></Map></div>
-      <div className="chat-container">
+      <div className="chat-container" ref={chatContainerRef}>
         <div className="chat-inner-container">
           <div className="messages">
             { messages.map((message, index) => <SingleMessage key={index} message={message} />) }
