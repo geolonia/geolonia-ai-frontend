@@ -37,20 +37,21 @@ const App: React.FC = () => {
       headers: {
         'Content-Type': 'application/json',
       },
-      mode: 'no-cors',
     });
-    const reader = resp.body?.getReader();
-    if (!reader) return;
-    const decoder = new TextDecoder('utf-8');
-    const chunks: string[] = [];
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      if (!value) continue;
+    // const reader = resp.body?.getReader();
+    // if (!reader) return;
+    // const decoder = new TextDecoder('utf-8');
+    // const chunks: string[] = [];
+    // while (true) {
+    //   const { done, value } = await reader.read();
+    //   if (done) break;
+    //   if (!value) continue;
 
-      chunks.push(decoder.decode(value));
-    }
-    console.log(chunks);
+    //   chunks.push(decoder.decode(value));
+    // }
+    // console.log(chunks);
+    const body = await resp.json();
+    setMessages((prev) => [...prev, ...body.lines.map((x: { content: string }) => ({ type: 'response', text: x.content }))]);
   }, []);
 
   return (
