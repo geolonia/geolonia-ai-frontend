@@ -54,20 +54,22 @@ html, body, #root, .App
 
       &.request
       {
+        color: #fff;
         background-color: #1C87EB;
-        color: #FFFFFF;
         text-align: right;
         float: right;
-
+        margin-right: 0px;
+        margin-left: 120px;
+        box-shadow: 0 0px 4px 0 rgba(0, 0, 0, .2);
         &:after {
           display: block;
           position: absolute;
-          top: 8px;
+          top: 12px;
           right: -10px;
-          z-index: 9999;
+          z-index: 999;
           content: "";
-          border-top: 10px solid transparent;
-          border-bottom: 10px solid transparent;
+          border-top: 7px solid transparent;
+          border-bottom: 7px solid transparent;
           border-left: 10px solid #1C87EB;
         }
       }
@@ -75,12 +77,14 @@ html, body, #root, .App
 
       &.response
       {
-        color: #000000;
+        background-color: #FFF;
+        color: #222;
         margin-left: 10px;
         // height: 120px;
         float: left;
-
         margin-left: 48px;
+        margin-right: 120px;
+        box-shadow: 0 0px 4px 0 rgba(0, 0, 0, .2);
         &:before {
           content: "";
           width: 32px;
@@ -97,13 +101,13 @@ html, body, #root, .App
         &:after {
           display: block;
           position: absolute;
-          top: 8px;
+          top: 12px;
           left: -10px;
-          z-index: 9999;
+          z-index: 999;
           content: "";
-          border-top: 10px solid transparent;
-          border-right: 10px solid #FFFFFF;
-          border-bottom: 10px solid transparent;
+          border-top: 7px solid transparent;
+          border-right: 10px solid #FFF;
+          border-bottom: 7px solid transparent;
         }
       }
     }
