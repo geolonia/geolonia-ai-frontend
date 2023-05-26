@@ -131,6 +131,8 @@ html, body, #root, .App
       border-radius: 8px;
       box-shadow: 0 0px 4px 4px rgba(0, 0, 0, .4);
       margin-bottom: 10px;
+      background: #fff url(../public/send.svg) no-repeat center right 10px;
+      background-size: 20px auto;
     }
   }
 }
