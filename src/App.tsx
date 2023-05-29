@@ -72,7 +72,11 @@ const App: React.FC = () => {
       if (x.content === 'START') {
         return { ...out, inStyleInstructions: true };
       } else if (x.content === 'END') {
-        return { ...out, inStyleInstructions: false };
+        return {
+          ...out,
+          inStyleInstructions: false,
+          lines: [...out.lines, 'スタイルを変更しました。'],
+        };
       } else if (out.inStyleInstructions) {
         const line = Papa.parse<string[]>(x.content.replace(/",\s+/g, '",'));
         const [layerName, propertyPath, value] = line.data[0];
@@ -89,7 +93,6 @@ const App: React.FC = () => {
         return {
           ...out,
           instructions: [...out.instructions, ...instructions],
-          lines: [...out.lines, 'スタイルを変更しました。'],
         };
       }
 
