@@ -1,4 +1,4 @@
-import React from 'react';
+import { useEffect, useRef } from 'react';
 
 declare global {
   interface Window {
@@ -7,32 +7,40 @@ declare global {
 }
 
 interface Props {
-    className: string;
-    setmap?: Function;
+  className?: string;
+  onLoad?: (map: any) => void;
 }
 
-const Component = (props: Props) => {
-  const mapContainer = React.useRef<HTMLDivElement>(null)
+const MapComponent = (props: Props) => {
+  const { onLoad } = props;
+  const mapContainer = useRef<HTMLDivElement>(null)
 
-  React.useEffect(() => {
+  useEffect(() => {
     const map = new window.geolonia.Map({
       container: mapContainer.current,
-      style: "geolonia/gsi",
+      style: "geolonia/basic-world",
+      lang: 'ja',
       hash: true,
-    })
+    });
+    (window as any)._mainMap = map;
 
     map.on("load", () => {
-      if (props.setmap) {
-        props.setmap(map)
+      if (onLoad) {
+        onLoad(map);
       }
     })
-  }, [mapContainer, props])
+  }, [onLoad]);
 
   return (
     <>
-      <div className={props.className} ref={mapContainer} data-navigation-control="on" data-gesture-handling="off"></div>
+      <div
+        className={props.className}
+        ref={mapContainer}
+        data-navigation-control="on"
+        data-gesture-handling="off"
+      ></div>
     </>
   );
 }
 
-export default Component;
+export default MapComponent;

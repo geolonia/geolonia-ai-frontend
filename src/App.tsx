@@ -2,7 +2,9 @@ import Map from './Map'
 import './App.scss';
 import { useCallback, useLayoutEffect, useRef, useState } from 'react';
 import classNames from 'classnames';
-import { Message } from './types';
+import { Instruction, Message } from './types';
+
+import Papa from "papaparse";
 
 const SingleMessage: React.FC<{ message: Message }> = ({ message }) => {
   if (message.pending) {
@@ -39,6 +41,7 @@ const ChatInputForm: React.FC<{ onSubmit: (text: string) => void }> = ({ onSubmi
 };
 
 const App: React.FC = () => {
+  const mapRef = useRef<any>(null);
   const [ messages, setMessages ] = useState<Message[]>([]);
   const chatContainerRef = useRef<HTMLDivElement>(null);
 
@@ -56,10 +59,81 @@ const App: React.FC = () => {
       },
     });
 
-    const body = await resp.json();
+    const body = await resp.json() as { lines: { content: string }[] };
+
+    const {
+      instructions,
+      lines,
+    } = body.lines.reduce<{
+      inStyleInstructions: boolean,
+      instructions: Instruction[],
+      lines: string[],
+    }>((out, x) => {
+      if (x.content === 'START') {
+        return { ...out, inStyleInstructions: true };
+      } else if (x.content === 'END') {
+        return { ...out, inStyleInstructions: false };
+      } else if (out.inStyleInstructions) {
+        const line = Papa.parse<string[]>(x.content.replace(/",\s+/g, '",'));
+        const [layerName, propertyPath, value] = line.data[0];
+        const multipleLayers = layerName.split(/,\s+/);
+        const instructions: Instruction[] = [];
+        for (const layerName of multipleLayers) {
+          instructions.push({
+            type: 'STYLE_CHANGE',
+            layerName,
+            propertyPath,
+            value,
+          });
+        }
+        return {
+          ...out,
+          instructions: [...out.instructions, ...instructions],
+          lines: [...out.lines, 'スタイルを変更しました。'],
+        };
+      }
+
+      return {
+        ...out,
+        lines: [...out.lines, x.content],
+      };
+    }, {
+      inStyleInstructions: false,
+      instructions: [],
+      lines: [],
+    });
+
+    console.log("instructions", instructions);
+    const map = mapRef.current;
+    if (map) {
+      for (const instruction of instructions) {
+        if (instruction.type === 'STYLE_CHANGE') {
+          if (instruction.propertyPath.startsWith('paint.')) {
+            map.setPaintProperty(
+              instruction.layerName,
+              instruction.propertyPath.replace(/^paint\./, ''),
+              instruction.value,
+            );
+          } else if (instruction.propertyPath.startsWith('layout.')) {
+            map.setLayoutProperty(
+              instruction.layerName,
+              instruction.propertyPath.replace(/^layout\./, ''),
+              instruction.value,
+            );
+          } else if (instruction.propertyPath.startsWith('visibility.')) {
+            map.setVisibilityProperty(
+              instruction.layerName,
+              instruction.propertyPath.replace(/^visibility\./, ''),
+              instruction.value,
+            );
+          }
+        }
+      }
+    }
+
     setMessages((prev) => [
       ...prev.filter((x) => !x.pending),
-      ...body.lines.map((x: { content: string }) => ({ type: 'response', text: x.content })),
+      ...lines.map((x) => ({ type: 'response' as const, text: x })),
     ]);
   }, []);
 
@@ -69,9 +143,15 @@ const App: React.FC = () => {
     }
   }, [messages]);
 
+  const onMapLoad = useCallback((map: any) => {
+    mapRef.current = map;
+  }, []);
+
   return (
     <div className="App">
-      <div className="map-contaienr"><Map className='map'></Map></div>
+      <div className="map-contaienr">
+        <Map className='map' onLoad={onMapLoad} />
+      </div>
       <div className="chat-container" ref={chatContainerRef}>
         <div className="chat-inner-container">
           <div className="messages">
