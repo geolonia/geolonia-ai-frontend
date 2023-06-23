@@ -1,10 +1,45 @@
+import type geolonia from '@geolonia/embed';
 import { GeoloniaMap } from '@geolonia/embed-react';
 import './App.scss';
-import { useMemo } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 
+function executeInstructions(map: geolonia.Map, instructions: any[]) {
+  for (const i of instructions) {
+    if (i.action === "mapCmd") {
+      //@ts-ignore
+      map[i.cmd](...i.argv);
+    }
+  }
+}
+
 const App: React.FC = () => {
+  const mapRef = useRef<geolonia.Map | null>(null);
   const sessionId = useMemo(() => uuidv4(), []);
+
+  useEffect(() => {
+    // connect to the websocket
+    const ws = new WebSocket(`wss://e4l6ubznlg.execute-api.ap-northeast-1.amazonaws.com/dev?session_id=${sessionId}`);
+    ws.addEventListener('open', () => {
+      console.log('connected');
+    });
+    ws.addEventListener('message', (event) => {
+      const data = JSON.parse(event.data);
+      console.log(data);
+      const instructions = data.instructions;
+      if (!mapRef.current) {
+        return;
+      }
+      executeInstructions(mapRef.current, instructions);
+    });
+    ws.addEventListener('close', () => {
+      console.log('disconnected');
+    });
+
+    return () => {
+      ws.close();
+    }
+  }, [sessionId]);
 
   return (
     <div className="App">
@@ -19,6 +54,7 @@ const App: React.FC = () => {
           zoom='4'
           marker='off'
           lang='ja'
+          mapRef={mapRef}
         />
       </div>
       <df-messenger
