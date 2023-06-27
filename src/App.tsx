@@ -20,21 +20,33 @@ const App: React.FC = () => {
 
   useEffect(() => {
     let disconnecting = false;
+    let pingTimer: number | null = null;
 
     // connect to the websocket
     const ws = new WebSocket(`wss://e4l6ubznlg.execute-api.ap-northeast-1.amazonaws.com/dev?session_id=${sessionId}`);
+
+    const ping = () => {
+      ws.send(JSON.stringify({
+        action: 'ping',
+      }));
+      pingTimer = window.setTimeout(ping, 30000);
+    };
+
     ws.addEventListener('open', () => {
       console.log('connected');
+      ping();
     });
+
     ws.addEventListener('message', (event) => {
       const data = JSON.parse(event.data);
       console.log(data);
       const instructions = data.instructions;
-      if (!mapRef.current) {
+      if (!mapRef.current || !instructions) {
         return;
       }
       executeInstructions(mapRef.current, instructions);
     });
+
     ws.addEventListener('close', () => {
       console.log('disconnected');
       if (!disconnecting) {
@@ -46,6 +58,9 @@ const App: React.FC = () => {
     });
 
     return () => {
+      if (pingTimer) {
+        window.clearTimeout(pingTimer);
+      }
       disconnecting = true;
       ws.close();
     }
@@ -70,7 +85,7 @@ const App: React.FC = () => {
       <df-messenger
         df-cx="true"
         location="asia-northeast1"
-        chat-title="Geolonia Maps AI"
+        chat-title="Geolonia Maps AI (高松市)"
         agent-id="4f9097c5-2941-4b93-a1be-75e07c23ebdb"
         session-id={sessionId}
         language-code="ja"
